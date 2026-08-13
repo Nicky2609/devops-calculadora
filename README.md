@@ -65,3 +65,9 @@ calculadora-jsx/
 ## Autor
 
 Karol Arenas
+
+## Colaboradores
+
+Juan Mora
+
+Diego Alberto
