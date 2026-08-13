@@ -64,4 +64,4 @@ calculadora-jsx/
 
 ## Autor
 
-Samuel Díaz
+Karol Arenas
