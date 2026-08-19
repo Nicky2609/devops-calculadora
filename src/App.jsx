@@ -212,6 +212,10 @@ export default function App() {
   ];
 
   const keys = [
+    { label: "MC", onClick: clearMemory, type: "memory" },
+    { label: "MR", onClick: recallMemory, type: "memory" },
+    { label: "M+", onClick: addToMemory, type: "memory" },
+    { label: "M−", onClick: subtractFromMemory, type: "memory" },
     {
       label: "AC",
       onClick: confirmClear,
@@ -307,29 +311,6 @@ export default function App() {
       onClick: inputEquals,
       type: "equals",
     },
-    { label: "MC", onClick: clearMemory, type: "memory" },
-    { label: "MR", onClick: recallMemory, type: "memory" },
-    { label: "M+", onClick: addToMemory, type: "memory" },
-    { label: "M−", onClick: subtractFromMemory, type: "memory" },
-    { label: "AC", onClick: clearAll, type: "func" },
-    { label: "+/-", onClick: toggleSign, type: "func" },
-    { label: "%", onClick: inputPercent, type: "func" },
-    { label: "÷", onClick: () => inputOperator("÷"), type: "op" },
-    { label: "7", onClick: () => inputDigit("7"), type: "num" },
-    { label: "8", onClick: () => inputDigit("8"), type: "num" },
-    { label: "9", onClick: () => inputDigit("9"), type: "num" },
-    { label: "×", onClick: () => inputOperator("×"), type: "op" },
-    { label: "4", onClick: () => inputDigit("4"), type: "num" },
-    { label: "5", onClick: () => inputDigit("5"), type: "num" },
-    { label: "6", onClick: () => inputDigit("6"), type: "num" },
-    { label: "−", onClick: () => inputOperator("−"), type: "op" },
-    { label: "1", onClick: () => inputDigit("1"), type: "num" },
-    { label: "2", onClick: () => inputDigit("2"), type: "num" },
-    { label: "3", onClick: () => inputDigit("3"), type: "num" },
-    { label: "+", onClick: () => inputOperator("+"), type: "op" },
-    { label: "0", onClick: () => inputDigit("0"), type: "num wide" },
-    { label: ".", onClick: () => inputDigit("."), type: "num" },
-    { label: "=", onClick: inputEquals, type: "equals" },
   ];
 
   return (
@@ -345,14 +326,19 @@ export default function App() {
           </div>
         </div>
 
-        <div className="keypad">
-          {keys.map((key) => (
+        <div className="sci-row">
+          {scientificKeys.map((key) => (
             <CalculatorButton
               key={key.label}
               label={key.label}
               onClick={key.onClick}
-              type={key.type}
+              type="scientific"
             />
+          ))}
+        </div>
+
+        <div className="keypad">
+          {keys.map((key) => (
             key.type === "memory" ? (
               <MemoryButton
                 key={key.label}
@@ -361,15 +347,12 @@ export default function App() {
                 active={memory !== null}
               />
             ) : (
-              <button
+              <CalculatorButton
                 key={key.label}
-                className={`key key--${key.type.split(" ")[0]} ${
-                  key.type.includes("wide") ? "key--wide" : ""
-                }`}
+                label={key.label}
                 onClick={key.onClick}
-              >
-                {key.label}
-              </button>
+                type={key.type}
+              />
             )
           ))}
         </div>
