@@ -107,6 +107,30 @@
   filter: brightness(1.15);
 }
 
+.key--memory {
+  position: relative;
+  background: #293039;
+  color: #aeb8c2;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  font-size: 14px;
+}
+
+.key--memory:hover {
+  filter: brightness(1.15);
+}
+
+.key--memory-active::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: #3ed6c4;
+  box-shadow: 0 0 6px rgba(62, 214, 196, 0.7);
+}
+
 .key--op {
   background: #3ed6c4;
   color: #0b2320;

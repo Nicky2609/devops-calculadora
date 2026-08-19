@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import MemoryButton from "./components/memoryButton";
 
 const OPERATORS = ["÷", "×", "−", "+"];
 
@@ -36,6 +37,7 @@ export default function App() {
   const [operator, setOperator] = useState(null);
   const [overwrite, setOverwrite] = useState(true);
   const [history, setHistory] = useState("");
+  const [memory, setMemory] = useState(null);
 
   const inputDigit = (digit) => {
     if (overwrite) {
@@ -93,6 +95,26 @@ export default function App() {
     setOverwrite(true);
   };
 
+  const clearMemory = () => setMemory(null);
+
+  const recallMemory = () => {
+    if (memory === null) return;
+    setDisplay(formatDisplay(memory));
+    setOverwrite(true);
+  };
+
+  const addToMemory = () => {
+    const value = parseFloat(display);
+    if (Number.isNaN(value)) return;
+    setMemory((currentMemory) => (currentMemory ?? 0) + value);
+  };
+
+  const subtractFromMemory = () => {
+    const value = parseFloat(display);
+    if (Number.isNaN(value)) return;
+    setMemory((currentMemory) => (currentMemory ?? 0) - value);
+  };
+
   const backspace = () => {
     if (overwrite) return;
     if (display.length <= 1 || (display.length === 2 && display.startsWith("-"))) {
@@ -134,6 +156,10 @@ export default function App() {
   });
 
   const keys = [
+    { label: "MC", onClick: clearMemory, type: "memory" },
+    { label: "MR", onClick: recallMemory, type: "memory" },
+    { label: "M+", onClick: addToMemory, type: "memory" },
+    { label: "M−", onClick: subtractFromMemory, type: "memory" },
     { label: "AC", onClick: clearAll, type: "func" },
     { label: "+/-", onClick: toggleSign, type: "func" },
     { label: "%", onClick: inputPercent, type: "func" },
@@ -164,15 +190,24 @@ export default function App() {
         </div>
         <div className="keypad">
           {keys.map((key) => (
-            <button
-              key={key.label}
-              className={`key key--${key.type.split(" ")[0]} ${
-                key.type.includes("wide") ? "key--wide" : ""
-              }`}
-              onClick={key.onClick}
-            >
-              {key.label}
-            </button>
+            key.type === "memory" ? (
+              <MemoryButton
+                key={key.label}
+                label={key.label}
+                onClick={key.onClick}
+                active={memory !== null}
+              />
+            ) : (
+              <button
+                key={key.label}
+                className={`key key--${key.type.split(" ")[0]} ${
+                  key.type.includes("wide") ? "key--wide" : ""
+                }`}
+                onClick={key.onClick}
+              >
+                {key.label}
+              </button>
+            )
           ))}
         </div>
       </div>
