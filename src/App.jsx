@@ -2,6 +2,7 @@ import CalculatorButton from "./CalculatorButton";
 
 import { useEffect, useState } from "react";
 import "./App.css";
+import MemoryButton from "./components/memoryButton";
 import { ScientificOperations } from "./ScientificOperations";
 
 const OPERATORS = ["÷", "×", "−", "+"];
@@ -43,6 +44,7 @@ export default function App() {
   const [operator, setOperator] = useState(null);
   const [overwrite, setOverwrite] = useState(true);
   const [history, setHistory] = useState("");
+  const [memory, setMemory] = useState(null);
 
   // Controla si aparece la ventana de confirmación
   const [showConfirm, setShowConfirm] = useState(false);
@@ -120,6 +122,26 @@ export default function App() {
   const inputPercent = () => {
     setDisplay(formatDisplay(parseFloat(display) / 100));
     setOverwrite(true);
+  };
+
+  const clearMemory = () => setMemory(null);
+
+  const recallMemory = () => {
+    if (memory === null) return;
+    setDisplay(formatDisplay(memory));
+    setOverwrite(true);
+  };
+
+  const addToMemory = () => {
+    const value = parseFloat(display);
+    if (Number.isNaN(value)) return;
+    setMemory((currentMemory) => (currentMemory ?? 0) + value);
+  };
+
+  const subtractFromMemory = () => {
+    const value = parseFloat(display);
+    if (Number.isNaN(value)) return;
+    setMemory((currentMemory) => (currentMemory ?? 0) - value);
   };
 
   const backspace = () => {
@@ -285,6 +307,29 @@ export default function App() {
       onClick: inputEquals,
       type: "equals",
     },
+    { label: "MC", onClick: clearMemory, type: "memory" },
+    { label: "MR", onClick: recallMemory, type: "memory" },
+    { label: "M+", onClick: addToMemory, type: "memory" },
+    { label: "M−", onClick: subtractFromMemory, type: "memory" },
+    { label: "AC", onClick: clearAll, type: "func" },
+    { label: "+/-", onClick: toggleSign, type: "func" },
+    { label: "%", onClick: inputPercent, type: "func" },
+    { label: "÷", onClick: () => inputOperator("÷"), type: "op" },
+    { label: "7", onClick: () => inputDigit("7"), type: "num" },
+    { label: "8", onClick: () => inputDigit("8"), type: "num" },
+    { label: "9", onClick: () => inputDigit("9"), type: "num" },
+    { label: "×", onClick: () => inputOperator("×"), type: "op" },
+    { label: "4", onClick: () => inputDigit("4"), type: "num" },
+    { label: "5", onClick: () => inputDigit("5"), type: "num" },
+    { label: "6", onClick: () => inputDigit("6"), type: "num" },
+    { label: "−", onClick: () => inputOperator("−"), type: "op" },
+    { label: "1", onClick: () => inputDigit("1"), type: "num" },
+    { label: "2", onClick: () => inputDigit("2"), type: "num" },
+    { label: "3", onClick: () => inputDigit("3"), type: "num" },
+    { label: "+", onClick: () => inputOperator("+"), type: "op" },
+    { label: "0", onClick: () => inputDigit("0"), type: "num wide" },
+    { label: ".", onClick: () => inputDigit("."), type: "num" },
+    { label: "=", onClick: inputEquals, type: "equals" },
   ];
 
   return (
@@ -308,6 +353,24 @@ export default function App() {
               onClick={key.onClick}
               type={key.type}
             />
+            key.type === "memory" ? (
+              <MemoryButton
+                key={key.label}
+                label={key.label}
+                onClick={key.onClick}
+                active={memory !== null}
+              />
+            ) : (
+              <button
+                key={key.label}
+                className={`key key--${key.type.split(" ")[0]} ${
+                  key.type.includes("wide") ? "key--wide" : ""
+                }`}
+                onClick={key.onClick}
+              >
+                {key.label}
+              </button>
+            )
           ))}
         </div>
       </div>
