@@ -1,3 +1,5 @@
+import CalculatorButton from "./CalculatorButton";
+
 import { useEffect, useState } from "react";
 import "./App.css";
 
@@ -6,6 +8,7 @@ const OPERATORS = ["÷", "×", "−", "+"];
 function calculate(a, operator, b) {
   const x = parseFloat(a);
   const y = parseFloat(b);
+
   switch (operator) {
     case "÷":
       return y === 0 ? "Error" : x / y;
@@ -22,11 +25,14 @@ function calculate(a, operator, b) {
 
 function formatDisplay(value) {
   if (value === "Error") return value;
+
   const str = String(value);
+
   if (str.length > 11) {
     const num = Number(value);
     return num.toExponential(5);
   }
+
   return str;
 }
 
@@ -37,23 +43,30 @@ export default function App() {
   const [overwrite, setOverwrite] = useState(true);
   const [history, setHistory] = useState("");
 
+  // Controla si aparece la ventana de confirmación
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const inputDigit = (digit) => {
     if (overwrite) {
       setDisplay(digit === "." ? "0." : digit);
       setOverwrite(false);
       return;
     }
+
     if (digit === "." && display.includes(".")) return;
+
     if (display === "0" && digit !== ".") {
       setDisplay(digit);
       return;
     }
+
     setDisplay(display + digit);
   };
 
   const inputOperator = (nextOperator) => {
     if (operator && !overwrite) {
       const result = calculate(previousValue, operator, display);
+
       setDisplay(formatDisplay(result));
       setPreviousValue(String(result));
       setHistory(`${formatDisplay(result)} ${nextOperator}`);
@@ -61,13 +74,16 @@ export default function App() {
       setPreviousValue(display);
       setHistory(`${display} ${nextOperator}`);
     }
+
     setOperator(nextOperator);
     setOverwrite(true);
   };
 
   const inputEquals = () => {
     if (operator === null || previousValue === null) return;
+
     const result = calculate(previousValue, operator, display);
+
     setHistory(`${previousValue} ${operator} ${display} =`);
     setDisplay(formatDisplay(result));
     setPreviousValue(null);
@@ -75,17 +91,29 @@ export default function App() {
     setOverwrite(true);
   };
 
+  // Borra definitivamente la calculadora
   const clearAll = () => {
     setDisplay("0");
     setPreviousValue(null);
     setOperator(null);
     setOverwrite(true);
     setHistory("");
+    setShowConfirm(false);
+  };
+
+  // Abre la ventana de confirmación
+  const confirmClear = () => {
+    setShowConfirm(true);
   };
 
   const toggleSign = () => {
     if (display === "0") return;
-    setDisplay(display.startsWith("-") ? display.slice(1) : `-${display}`);
+
+    setDisplay(
+      display.startsWith("-")
+        ? display.slice(1)
+        : `-${display}`
+    );
   };
 
   const inputPercent = () => {
@@ -95,17 +123,23 @@ export default function App() {
 
   const backspace = () => {
     if (overwrite) return;
-    if (display.length <= 1 || (display.length === 2 && display.startsWith("-"))) {
+
+    if (
+      display.length <= 1 ||
+      (display.length === 2 && display.startsWith("-"))
+    ) {
       setDisplay("0");
       setOverwrite(true);
       return;
     }
+
     setDisplay(display.slice(0, -1));
   };
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       const { key } = event;
+
       if (/^[0-9]$/.test(key)) {
         inputDigit(key);
       } else if (key === ".") {
@@ -124,58 +158,171 @@ export default function App() {
       } else if (key === "Backspace") {
         backspace();
       } else if (key === "Escape") {
-        clearAll();
+        setShowConfirm(false);
       } else if (key === "%") {
         inputPercent();
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   });
 
   const keys = [
-    { label: "AC", onClick: clearAll, type: "func" },
-    { label: "+/-", onClick: toggleSign, type: "func" },
-    { label: "%", onClick: inputPercent, type: "func" },
-    { label: "÷", onClick: () => inputOperator("÷"), type: "op" },
-    { label: "7", onClick: () => inputDigit("7"), type: "num" },
-    { label: "8", onClick: () => inputDigit("8"), type: "num" },
-    { label: "9", onClick: () => inputDigit("9"), type: "num" },
-    { label: "×", onClick: () => inputOperator("×"), type: "op" },
-    { label: "4", onClick: () => inputDigit("4"), type: "num" },
-    { label: "5", onClick: () => inputDigit("5"), type: "num" },
-    { label: "6", onClick: () => inputDigit("6"), type: "num" },
-    { label: "−", onClick: () => inputOperator("−"), type: "op" },
-    { label: "1", onClick: () => inputDigit("1"), type: "num" },
-    { label: "2", onClick: () => inputDigit("2"), type: "num" },
-    { label: "3", onClick: () => inputDigit("3"), type: "num" },
-    { label: "+", onClick: () => inputOperator("+"), type: "op" },
-    { label: "0", onClick: () => inputDigit("0"), type: "num wide" },
-    { label: ".", onClick: () => inputDigit("."), type: "num" },
-    { label: "=", onClick: inputEquals, type: "equals" },
+    {
+      label: "AC",
+      onClick: confirmClear,
+      type: "danger",
+    },
+    {
+      label: "+/-",
+      onClick: toggleSign,
+      type: "func",
+    },
+    {
+      label: "%",
+      onClick: inputPercent,
+      type: "func",
+    },
+    {
+      label: "÷",
+      onClick: () => inputOperator("÷"),
+      type: "op",
+    },
+    {
+      label: "7",
+      onClick: () => inputDigit("7"),
+      type: "num",
+    },
+    {
+      label: "8",
+      onClick: () => inputDigit("8"),
+      type: "num",
+    },
+    {
+      label: "9",
+      onClick: () => inputDigit("9"),
+      type: "num",
+    },
+    {
+      label: "×",
+      onClick: () => inputOperator("×"),
+      type: "op",
+    },
+    {
+      label: "4",
+      onClick: () => inputDigit("4"),
+      type: "num",
+    },
+    {
+      label: "5",
+      onClick: () => inputDigit("5"),
+      type: "num",
+    },
+    {
+      label: "6",
+      onClick: () => inputDigit("6"),
+      type: "num",
+    },
+    {
+      label: "−",
+      onClick: () => inputOperator("−"),
+      type: "op",
+    },
+    {
+      label: "1",
+      onClick: () => inputDigit("1"),
+      type: "num",
+    },
+    {
+      label: "2",
+      onClick: () => inputDigit("2"),
+      type: "num",
+    },
+    {
+      label: "3",
+      onClick: () => inputDigit("3"),
+      type: "num",
+    },
+    {
+      label: "+",
+      onClick: () => inputOperator("+"),
+      type: "op",
+    },
+    {
+      label: "0",
+      onClick: () => inputDigit("0"),
+      type: "num wide",
+    },
+    {
+      label: ".",
+      onClick: () => inputDigit("."),
+      type: "num",
+    },
+    {
+      label: "=",
+      onClick: inputEquals,
+      type: "equals",
+    },
   ];
 
   return (
     <div className="stage">
       <div className="calculator">
         <div className="screen">
-          <div className="screen-history">{history || "\u00A0"}</div>
-          <div className="screen-value">{display}</div>
+          <div className="screen-history">
+            {history || "\u00A0"}
+          </div>
+
+          <div className="screen-value">
+            {display}
+          </div>
         </div>
+
         <div className="keypad">
           {keys.map((key) => (
-            <button
+            <CalculatorButton
               key={key.label}
-              className={`key key--${key.type.split(" ")[0]} ${
-                key.type.includes("wide") ? "key--wide" : ""
-              }`}
+              label={key.label}
               onClick={key.onClick}
-            >
-              {key.label}
-            </button>
+              type={key.type}
+            />
           ))}
         </div>
       </div>
+
+      {/* Ventana de confirmación */}
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <h2>¿Borrar todo?</h2>
+
+            <p>
+              Esta acción borrará definitivamente
+              la operación actual.
+            </p>
+
+            <div className="confirm-buttons">
+              <button
+                className="confirm-cancel"
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="confirm-delete"
+                onClick={clearAll}
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
