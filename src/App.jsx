@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import { ScientificOperations } from "./ScientificOperations";
 
 const OPERATORS = ["÷", "×", "−", "+"];
 
@@ -103,6 +104,15 @@ export default function App() {
     setDisplay(display.slice(0, -1));
   };
 
+  const applyUnary = (fn, symbol) => {
+    const value = parseFloat(display);
+    const result = fn(value);
+    const output = Number.isFinite(result) ? result : "Error";
+    setHistory(`${symbol}(${display})`);
+    setDisplay(formatDisplay(output));
+    setOverwrite(true);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       const { key } = event;
@@ -133,6 +143,14 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   });
 
+  const scientificKeys = [
+    { label: "√", onClick: () => applyUnary(ScientificOperations.sqrt, "√") },
+    { label: "x²", onClick: () => applyUnary(ScientificOperations.square, "sq") },
+    { label: "sin", onClick: () => applyUnary(ScientificOperations.sin, "sin") },
+    { label: "cos", onClick: () => applyUnary(ScientificOperations.cos, "cos") },
+    { label: "log", onClick: () => applyUnary(ScientificOperations.log, "log") },
+  ];
+
   const keys = [
     { label: "AC", onClick: clearAll, type: "func" },
     { label: "+/-", onClick: toggleSign, type: "func" },
@@ -161,6 +179,17 @@ export default function App() {
         <div className="screen">
           <div className="screen-history">{history || "\u00A0"}</div>
           <div className="screen-value">{display}</div>
+        </div>
+        <div className="sci-row">
+          {scientificKeys.map((key) => (
+            <button
+              key={key.label}
+              className="key key--scientific"
+              onClick={key.onClick}
+            >
+              {key.label}
+            </button>
+          ))}
         </div>
         <div className="keypad">
           {keys.map((key) => (
